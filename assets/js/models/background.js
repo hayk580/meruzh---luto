@@ -6,7 +6,7 @@ class Background {
     this.y = 0
     this.h = this.ctx.canvas.height
     // this.w = this.ctx.canvas.width
-    this.w = 19892
+    this.w = MASIV_WIDTH
     this.vx = -3
 
     this.img = new Image()

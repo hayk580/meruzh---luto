@@ -8,16 +8,16 @@ class Game {
 
     this.fps = 1040 / 60
     this.drawInterval = undefined
-
+    
+    
     this.background = new Background(this.ctx)
     this.bag = new Bag(this.ctx)
     this.shaurma = new Shaurma(this.ctx)
     this.mario = new Mario(this.ctx, 50, this.canvas.height - 120)
     this.alvardTati = new Alvard()
     this.bichok = new Fireball()
-    this.nextLevel = undefined
-    this.paperAnimation = undefined
-    this.paperPoints = 0
+
+    this.drow = true
 
     this.coins = [
 
@@ -31,7 +31,6 @@ class Game {
 
     ]
 
-    this.masiviBisetka = new Bisetka(this.ctx, MASIV_WIDTH - 700, this.canvas.height - 200)
 
     this.alvards = [
 
@@ -50,16 +49,12 @@ class Game {
 
 
     this.kims = [
-      new Kim(this.ctx, this.mario.x + 2100, this.mario.y - 20),
+      new Kim(this.ctx, this.mario.x + 2100, this.mario.y),
       new Kim(this.ctx, this.mario.x + 2400, this.mario.y),
     ]
 
 
-    this.papers = [
-      new Paper(this.ctx, this.mario.x + 1100, this.mario.y),
-      new Paper(this.ctx, this.mario.x + 1400, this.mario.y),
-      new Paper(this.ctx, this.mario.x + 3000, this.mario.y),
-      ]
+
 
 
     this.blocks = [
@@ -70,12 +65,8 @@ class Game {
       // new Blocks(this.ctx, this.mario.x + 700, this.mario.y - 60),
       // new Blocks(this.ctx, this.mario.x + 750, this.mario.y - 60),
 
-
-
       // new Blocks(this.ctx, this.mario.x + 900, this.mario.y - 60),
       // new Blocks(this.ctx, this.mario.x + 950, this.mario.y - 60),
-
-
 
     ]
 
@@ -89,8 +80,6 @@ class Game {
       this.blocks.push(new Blocks(this.ctx, this.mario.x + x, this.mario.y - y))
     }
 
-    this.points = 0
-    console.log(this.blocks)
 
     this.points = 0
     this.pointsCoin = new Coin(this.ctx, 10, 10)
@@ -106,8 +95,7 @@ class Game {
       coin: new Audio('./assets/sound/coin.wav'),
       alvard: new Audio('./assets/sound/coin.wav'),
       die: new Audio('./assets/sound/die.mp3'),
-      tati: new Audio('./assets/sound/tati.wav'),
-      kim_come: new Audio('./assets/sound/kimcome.wav')
+      tati: new Audio('./assets/sound/tati.wav')
     }
   }
 
@@ -134,19 +122,19 @@ class Game {
     }
   }
 
-
   start() {
     if (!this.drawInterval) {
       this.sounds.theme.play()
       this.drawInterval = setInterval(() => {
         this.clear()
+        this.checkCollisions()
         this.move()
         this.draw()
-        this.checkCollisions()
+        
         this.alvards.forEach(alvard => alvard.move())
         this.polices.forEach(police => police.move())
-        this.papers.forEach(paper => paper.move())
-        this.masiviBisetka.move()
+        this.kims.forEach(kim => kim.move())
+
       }, this.fps);
     }
 
@@ -158,9 +146,7 @@ class Game {
   }
 
   draw() {
-    
     this.background.draw()
-    this.kims.forEach(kims => kims.draw())
     this.mario.draw()
     if(this.bag.flag) {
       this.bag.draw()
@@ -173,10 +159,12 @@ class Game {
     this.blocks.forEach(blocks => blocks.draw())
     this.alvards.forEach(alvards => alvards.draw())
     this.polices.forEach(polices => polices.draw())
+    this.kims.forEach(kims => kims.draw())
     this.pointsCoin.draw()
-    // this.alvards.forEach(alvards => alvards.move()) 
-    this.masiviBisetka.draw()
-    this.papers.forEach(paper => paper.draw())
+
+    // this.alvards.forEach(alvards => alvards.move())
+    //console.log(this.mario.y);
+
     this.ctx.save()
     this.ctx.font = '18px Arial'
     this.ctx.fillText(`միավորներ: ${this.points}`, 30, 25)
@@ -184,7 +172,7 @@ class Game {
   }
 
   move() {
-    if (this.mario.x === this.mario.maxX && this.mario.isDie == false) {
+    if (this.mario.x === this.mario.maxX  && this.mario.isDie == false) {
       this.background.move()
       this.coins.forEach(coins => coins.move())
       // this.alvards.forEach(alvards => alvards.stop = false)
@@ -192,10 +180,8 @@ class Game {
       this.alvards.forEach(alvards => alvards.moveRigth())
       this.polices.forEach(polices => polices.moveRigth())
       this.blocks.forEach(blocks => blocks.move())
-      this.papers.forEach(papers => papers.move(this.mario.x))
-      this.masiviBisetka.move(this.mario.x)
-      this.kims.forEach(kim => kim.move())
       this.bag.move()
+
     }
     this.mario.move()
   }
@@ -204,83 +190,69 @@ class Game {
     this.mario.onKeyEvent(event)
     this.background.onKeyEvent(event)
     this.bag.onKeyEvent(event)
+
     this.coins.forEach(coin => coin.onKeyEvent(event))
     this.alvards.forEach(alvards => alvards.onKeyEvent(event))
     this.polices.forEach(polices => polices.onKeyEvent(event))
     this.kims.forEach(kims => kims.onKeyEvent(event))
     this.blocks.forEach(blocks => blocks.onKeyEvent(event))
-    this.papers.forEach(papers => papers.onKeyEvent(event))
-    this.masiviBisetka.onKeyEvent(event)
+
   }
 
   checkCollisions() {
+    // if (this.drow) {
+    //   this.drow = false
+    //   // this.drowGreade(100, 1)
+    //   // this.drowGreade(1000, 1)
+    //   // this.drowGreade(2000, 2)
+    // }
 
-    this.mario.collidesWithShaurma(this.shaurma) 
-    if(this.mario.collidesWithShaurma(this.shaurma)){
-      this.shaurma.flag = false;
-      this.bag.flag = false;
-      this.bag.y = -32687
-      if(this.mario.flag == 1 && !this.shaurma.flag) {
-        this.mario.flag = 2;
-      }
-      else if(this.mario.flag == 0 && !this.shaurma.flag) {
-        this.mario.flag = 1;
-      }
-      else if(this.mario.flag == 2 && !this.shaurma.flag) {
-        this.mario.flag = 2;
-      }
+      this.mario.collidesWithShaurma(this.shaurma) 
+      if(this.mario.collidesWithShaurma(this.shaurma)){
+        this.shaurma.flag = false;
+        this.bag.flag = false;
+        this.bag.y = -32687
+        if(this.mario.flag == 1 && !this.shaurma.flag) {
+          this.mario.flag = 2;
+        }
+        else if(this.mario.flag == 0 && !this.shaurma.flag) {
+          this.mario.flag = 1;
+        }
+        else if(this.mario.flag == 2 && !this.shaurma.flag) {
+          this.mario.flag = 2;
+        }
 
-    }
+      }
+      
 
     const dieAlvards = this.alvards.filter(alvard => !this.bichok.collidesWithAnmie(alvard))
     this.alvards = dieAlvards
 
 
     const restCoins = this.coins.filter(coin => !this.mario.collidesWith(coin))
-
-    const restPapers = this.papers.filter(paper => !this.mario.collidesWith(paper))
-    this.papers.forEach(paper => {
-    if(this.mario.collidesWith(paper)) {
-        this.paperAnimation = setInterval(() => {
-            paper.animate(this.mario.x, this.mario.y)
-        });
-        setTimeout(() => {
-            clearInterval(this.paperAnimation)
-        }, 2000);
-     //   console.log("ara")
-    }
-    })
-
-    const newPapers = this.papers.length - restPapers.length // paper-ov inch ka sax avelacraca
     const newPoints = this.coins.length - restCoins.length
-    this.paperPoints += newPapers
-    this.papers = restPapers
     this.points += newPoints
 
-    
     if (newPoints) {
       this.sounds.coin.currentTime = 0
       this.sounds.coin.play()
     }
 
     this.coins = restCoins
-
-
     if(this.mario.collidesWithBag(this.bag)) {
       this.shaurma.flag = true;
     }
 
-
-
     const restAlvards = this.alvards.filter(alvard => !this.mario.collidesWithAlvard(alvard))
     const newAlvards = this.alvards.length - restAlvards.length
-    this.points += newAlvards
+    // this.points += newAlvards
 
     if (newAlvards) {
       this.sounds.alvard.currentTime = 0
       // this.sounds.alvard.play()
       this.sounds.theme.pause()
       this.sounds.theme2.play()
+
 
       if (this.mario.flag == 2) {
         this.alvards = restAlvards
@@ -303,21 +275,10 @@ class Game {
 
     }
 
-    const restKim = this.kims.filter(kim => !this.mario.collidesWithKim(kim))
-    const newKim = this.kims.length - restKim.length
 
-    if(newKim) {
-     //this.sounds.kim_come.currentTime = 0;
-      this.sounds.kim_come.play()
-    }
-
-    //this.kims = restKim
-
-
-
+   
 
     this.blocks.map(el => {
-
 
       const x = this.mario.collidesWithBlocks(el)
 
@@ -338,14 +299,10 @@ class Game {
             this.mario.x <= el.x + el.width && this.mario.y > el.y) {
             this.mario.isJumping = true
           }
-
     })
 
 
   }
-
-
-
 
 
 }

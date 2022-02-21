@@ -9,3 +9,5 @@ const MOVEMENT_FRAMES_KIMS = 23
 const SPEED = 4
 const ALVARDSPEED = 0.7
 const GRAVITY = 0.2
+
+const MASIV_WIDTH = 19892

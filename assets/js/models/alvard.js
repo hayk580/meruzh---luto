@@ -83,6 +83,10 @@ class Alvard {
     }
   }
 
+  animateDie() {
+    this.sprite.verticalFrameIndex = 0
+    this.sprite.horizontalFrameIndex = 3
+  }
 
 
 

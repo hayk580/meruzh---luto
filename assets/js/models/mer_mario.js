@@ -11,6 +11,7 @@ class Mario {
     this.maxY = y
     this.vy = 0
     this.flag = 1
+
     this.width = 0
     this.height = 0
     this.turn = true
@@ -18,9 +19,9 @@ class Mario {
 
     this.sprite = new Image()
     if (this.flag == 1) { this.sprite.src = './assets/img/meruzh.png' }
-    if (this.flag == 0) { this.sprite.src = './assets/img/bab-meruzh.png' }
+    if (this.flag == 0) { this.sprite.src = './assets/img/littlemeruzh.png' }
     if (this.flag == 2) { this.sprite.src = './assets/img/big-meruzh.png' }
-    this.sprite.src = './assets/img/Meruzhhh-01.png'
+    this.sprite.src = './assets/img/meruzh.png'
     this.sprite.isReady = false
     this.sprite.horizontalFrames = 4
     this.sprite.verticalFrames = 4
@@ -65,7 +66,7 @@ class Mario {
 
   draw() {
     if (this.isReady()) {
-      if (this.flag == 0) { this.sprite.src = './assets/img/bab-meruzh.png' }
+      if (this.flag == 0) { this.sprite.src = './assets/img/littlemeruzh.png' }
       if (this.flag == 1) { this.sprite.src = './assets/img/meruzh.png' }
       if (this.flag == 2) { this.sprite.src = './assets/img/big-meruzh.png' }
       this.ctx.drawImage(
@@ -77,8 +78,7 @@ class Mario {
         this.x,
         this.y,
         this.width,
-        this.height,
-        this.turn
+        this.height
       )
 
       this.sprite.drawCount++
@@ -104,9 +104,7 @@ class Mario {
         this.movements.left = status
         break;
       case KEY_FIRE:
-        if (this.canFire) { 
-          this.animateJump()
-          this.animateSitting()
+        if (this.canFire) {
           this.bullets.push(new Fireball(this.ctx, this.x + this.width, this.y, this.maxY + this.height))
           this.sounds.fire.currentTime = 0
           this.sounds.fire.play()
@@ -137,7 +135,7 @@ class Mario {
     }
 
 
-    if (this.movements.down && !this.isSitting) {
+    if (this.movements.down && !this.isSitting && this.isDie == false) {
       this.isSitting = true
     } else if (!this.movements.down) {
       // this.vy = this.vy
@@ -180,12 +178,15 @@ class Mario {
   animate() {
     if (this.isJumping && this.isDie == false) {
       this.animateJump()
-    } else if (this.movements.right && this.isDie == false) {
-      this.turn = true;
+    }
+    else if (this.movements.right && this.isDie == false) {
+      this.turn = true
       this.animateRight()
-    } else if (this.movements.left && this.isDie == false) {
-      this.turn = false;
+    }
+    else if (this.movements.left && this.isDie == false) {
+      this.turn = false
       this.animateLeft()
+
     }
     else if (this.isDie) {
       this.animateDie()
@@ -196,28 +197,34 @@ class Mario {
     else {
       this.resetAnimation()
     }
+    
   }
 
   resetAnimation() {
-    if(this.turn == true) {
-    this.sprite.horizontalFrameIndex = 0
-    this.sprite.verticalFrameIndex = 0
+    
+    if (this.turn == true) {
+      this.sprite.horizontalFrameIndex = 0
+      this.sprite.verticalFrameIndex = 0
     }
-    if(this.turn == false) {
-    this.sprite.horizontalFrameIndex = 0
-    this.sprite.verticalFrameIndex = 2
+    if (this.turn == false) {
+      this.sprite.horizontalFrameIndex = 0
+      this.sprite.verticalFrameIndex = 2
     }
   }
 
   animateJump() {
-    if(this.turn == true) {
-    this.sprite.verticalFrameIndex = 1
-    this.sprite.horizontalFrameIndex = 0
+    if (this.turn == true) {
+
+
+      this.sprite.verticalFrameIndex = 1
+      this.sprite.horizontalFrameIndex = 0
     }
-    if(this.turn == false) {
+    if (this.turn == false) {
       this.count = 1
+
+
       this.sprite.verticalFrameIndex = 3
-    this.sprite.horizontalFrameIndex = 0
+      this.sprite.horizontalFrameIndex = 0
     }
   }
 
@@ -237,16 +244,15 @@ class Mario {
 
 
   animateSitting() {
-    if(this.turn == true) {
-    this.sprite.verticalFrameIndex = 1
-    this.sprite.horizontalFrameIndex = 2
+    if (this.turn == true) {
+      this.sprite.verticalFrameIndex = 1
+      this.sprite.horizontalFrameIndex = 2
     }
-    if(this.turn == false) {
+    if (this.turn == false) {
       this.sprite.verticalFrameIndex = 3
-    this.sprite.horizontalFrameIndex = 2
+      this.sprite.horizontalFrameIndex = 2
     }
   }
-
 
 
   animateRight() {
@@ -262,7 +268,6 @@ class Mario {
       this.sprite.drawCount = 0
     }
   }
-
   animateLeft() {
     if (this.sprite.verticalFrameIndex !== 2) {
       this.sprite.verticalFrameIndex = 2
@@ -275,7 +280,10 @@ class Mario {
       }
       this.sprite.drawCount = 0
     }
+
   }
+
+ 
 
   collidesWith(element) {
     return this.x < element.x + element.width &&
@@ -292,12 +300,6 @@ class Mario {
       this.y + this.height > element.y
   }
 
-  collidesWithKim(element) {
-    return this.x < element.x + element.width &&
-      this.x + this.width > element.x &&
-      this.y < element.y + element.height &&
-      this.y + this.height > element.y
-  }
 
 
 
@@ -305,17 +307,13 @@ class Mario {
 
     if (this.x < element.x + element.width &&
       this.x + this.width > element.x &&
-      this.y < element.y + element.height &&
-      this.y + this.height > element.y) {
+      this.y < element.y + element.height + 10 &&
+      this.y + this.height + 10 > element.y) {
       return "true"
     }
-
     else {
       return false
     }
-
-
-
   }
 
   collidesWithBag(element) {
@@ -330,7 +328,6 @@ class Mario {
       return false
     }
   }
-
   collidesWithShaurma(element) {
 
     if (this.x < element.x + element.width &&
@@ -343,5 +340,4 @@ class Mario {
       return false
     }
   }
-
 }
